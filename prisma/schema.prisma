@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String             @id @default(cuid())
+  name           String
+  email          String             @unique
+  passwordHash   String
+  age            Int?
+  district       String?
+  occupation     String?
+  interests      String             @default("[]")
+  goals          String             @default("[]")
+  createdAt      DateTime           @default(now())
+  participants   EventParticipant[]
+  sessions       UserSession[]
+  swipesGiven    Swipe[]            @relation("SwipesGiven")
+  swipesReceived Swipe[]            @relation("SwipesReceived")
+  matchesAsUserA Match[]            @relation("MatchesAsUserA")
+  matchesAsUserB Match[]            @relation("MatchesAsUserB")
+}
+
+model Event {
+  id           String             @id @default(cuid())
+  title        String
+  description  String
+  category     String
+  imageUrl     String
+  location     String
+  latitude     Float
+  longitude    Float
+  eventDate    DateTime
+  createdAt    DateTime           @default(now())
+  participants EventParticipant[]
+  swipes       Swipe[]
+  matches      Match[]
+}
+
+model EventParticipant {
+  id       String   @id @default(cuid())
+  userId   String
+  eventId  String
+  joinedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([eventId])
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Swipe {
+  id         String   @id @default(cuid())
+  eventId    String
+  fromUserId String
+  toUserId   String
+  liked      Boolean
+  createdAt  DateTime @default(now())
+
+  event    Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  fromUser User  @relation("SwipesGiven", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User  @relation("SwipesReceived", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, fromUserId, toUserId])
+  @@index([eventId, toUserId])
+}
+
+model Match {
+  id        String   @id @default(cuid())
+  eventId   String
+  userAId   String
+  userBId   String
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userA User  @relation("MatchesAsUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB User  @relation("MatchesAsUserB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userAId, userBId])
+  @@index([userAId])
+  @@index([userBId])
+}

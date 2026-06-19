@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  background: #f8fafc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+    
+  background: #f8fafc;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+.leaflet-container,
+.leaflet-popup-content,
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip,
+.leaflet-control {
+  font-family: var(--font-prompt), sans-serif !important;
+}
