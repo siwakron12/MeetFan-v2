@@ -8,6 +8,7 @@ export async function POST(
 ) {
   try {
     const [{ id }, user] = await Promise.all([params, requireCurrentUser()]);
+   console.log("Event ID:", id);
     const result = await joinEvent(user.id, id);
 
     return ok(result);

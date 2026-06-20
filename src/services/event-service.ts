@@ -94,7 +94,7 @@ export async function joinEvent(userId: string, eventId: string) {
     throw new Error("EVENT_NOT_FOUND");
   }
 
-  await prisma.$executeRawUnsafe("PRAGMA foreign_keys = OFF");
+  
   await prisma.eventParticipant.upsert({
     where: { userId_eventId: { userId, eventId } },
     update: {},
